@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  displayName String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  preference         UserPreference?
+  conversations      Conversation[]
+  journalEntries     JournalEntry[]
+  moodCheckIns       MoodCheckIn[]
+  assessmentResults  AssessmentResult[]
+  exerciseLogs       ExerciseLog[]
+}
+
+model UserPreference {
+  id                   String   @id @default(uuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wellnessGoals        String
+  theme                String   @default("system")
+  notificationSettings String   @default("{}")
+  voiceEnabled         Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model Conversation {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  archivedAt DateTime?
+
+  messages Message[]
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String
+  content        String
+  safetyStatus   String       @default("safe")
+  createdAt      DateTime     @default(now())
+}
+
+model JournalEntry {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String?
+  content      String
+  mood         String?
+  tags         String
+  aiReflection String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model MoodCheckIn {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moodScore   Int
+  emotionTags String
+  note        String?
+  createdAt   DateTime @default(now())
+}
+
+model SupportResource {
+  id          String  @id @default(uuid())
+  region      String
+  name        String
+  description String?
+  phone       String?
+  website     String?
+  emergency   Boolean @default(false)
+  active      Boolean @default(true)
+}
+
+// ─── Assessment ──────────────────────────────────────────────────────────────
+
+model AssessmentResult {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessmentId String   // e.g. "phq9", "gad7", "pss10"
+  answers      String   // JSON: { q1: 2, q2: 0, ... }
+  totalScore   Int
+  severity     String   // "minimal" | "mild" | "moderate" | "severe"
+  aiInsight    String?  // AI-generated personalised insight
+  createdAt    DateTime @default(now())
+}
+
+// ─── Exercise Log ─────────────────────────────────────────────────────────────
+
+model ExerciseLog {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exerciseId  String   // e.g. "box-breathing", "54321-grounding"
+  category    String   // "breathing" | "grounding" | "mindfulness" | "movement"
+  durationSec Int      // seconds taken
+  rating      Int?     // 1-5 user rating after completing
+  notes       String?
+  completedAt DateTime @default(now())
+}

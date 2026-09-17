@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-violet: #4a3b69;
+  --color-brand-cream: #f9f6f0;
+  --color-brand-mint: #a8d5ba;
+  --color-brand-apricot: #fbc4ab;
+  --color-brand-lavender: #e2d4f0;
+  --color-brand-coral: #f4a261;
+  --color-brand-text: #2b213a;
+}
+
+body {
+  background-color: var(--color-brand-cream);
+  color: var(--color-brand-text);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}

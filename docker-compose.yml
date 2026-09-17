@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: haven-db
+    restart: always
+    environment:
+      POSTGRES_USER: haven_user
+      POSTGRES_PASSWORD: haven_password
+      POSTGRES_DB: haven_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - haven_pgdata:/var/lib/postgresql/data
+
+volumes:
+  haven_pgdata:
